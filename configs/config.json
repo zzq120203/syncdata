@@ -1,0 +1,25 @@
+{
+  "urls": "STA://10.128.98.16:6379",
+  "authToken": "zzq120203",
+  "obsQueue": "ds.set",
+  "queue": "tea.data.queue",
+  "szClientUrl": "http://10.138.25.24:8099",
+  "sbClientUrl": "http://10.138.25.24:8099",
+  "mppConf": {
+    "url": "jdbc.iie.DBroker://10.144.16.18:21811,10.144.16.19:21811,10.144.16.20:21811/msg_db;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=mppserver",
+    "username": "zzq",
+    "password": "zzq",
+    "filters": "stat",
+    "initialSize": "5",
+    "maxActive": "300",
+    "maxWait": "60000",
+    "timeBetweenEvictionRunsMillis": "60000",
+    "minEvictableIdleTimeMillis": "300000",
+    "validationQuery": "SELECT 1",
+    "testWhileIdle": "true",
+    "testOnBorrow": "false",
+    "testOnReturn": "false",
+    "poolPreparedStatements": "true",
+    "maxPoolPreparedStatementPerConnectionSize": "200"
+  }
+}
