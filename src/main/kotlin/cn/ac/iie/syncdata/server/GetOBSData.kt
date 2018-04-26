@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
     private val log = LoggerFactory.getLogger(GetOBSData::class.java)
-    private val gson = GsonBuilder().create()
+    private val gson = GsonBuilder().disableHtmlEscaping().create()
     companion object {
         private val start = AtomicBoolean(true)
         fun stop() {

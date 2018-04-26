@@ -17,12 +17,13 @@ import java.util.concurrent.atomic.AtomicInteger
 class EngineHandler : Runnable {
 
     companion object {
-        private val gson = GsonBuilder().create()
+        private val gson = GsonBuilder().disableHtmlEscaping().create()
         private val idx = AtomicInteger(0)
 
         private val iList = ArrayList<String>()
         private val aList = ArrayList<String>()
         private val vList = ArrayList<String>()
+        private val oList = ArrayList<String>()
 
         private var start = AtomicBoolean(true)
         private val log = LoggerFactory.getLogger(EngineHandler::class.java)
@@ -53,6 +54,11 @@ class EngineHandler : Runnable {
                             log.info("eid -> $eid, md -> $json")
                             jedis.rpush("${config().queue}.$eid", json)
                         }
+                        'o' -> for (eid in oList) {
+                            val json = gson.toJson(md)
+                            log.info("eid -> $eid, md -> $json")
+                            jedis.rpush("${config().queue}.$eid", json)
+                        }
                         else -> log.error("mm -> {}", mm)
                     }
                 } finally {
@@ -63,7 +69,7 @@ class EngineHandler : Runnable {
     }
 
     override fun run() {
-        val sql = "select id,e_id,data_type,status from engine;"
+        val sql = "select id,e_id,data_type,parent,status from engine;"
         do {
             DBUtil.selectMysql(sql = sql, print = false, resultFun = ::getEngine)
         } while (start.get())
@@ -71,20 +77,27 @@ class EngineHandler : Runnable {
 
     private fun getEngine(rs: ResultSet) {
         while (rs.next()) {
-            val id = rs.getString("e_id") + "-" + rs.getInt("id")
-            val status = rs.getInt("status")
-            when (rs.getInt("data_type")) {
-                34 -> when (status) {
-                    1 -> if (!aList.contains(id)) aList.add(id)
-                    else -> if (aList.contains(id)) aList.remove(id)
-                }
-                43 -> when (status) {
-                    1 -> if (!vList.contains(id)) vList.add(id)
-                    else -> if (vList.contains(id)) vList.remove(id)
-                }
-                3 -> when (status) {
-                    1 -> if (!iList.contains(id)) iList.add(id)
-                    else -> if (iList.contains(id)) iList.remove(id)
+            val parent = rs.getString("parent")
+            if (parent.isNullOrEmpty()) {
+                val id = rs.getString("e_id") + "-" + rs.getInt("id")
+                val status = rs.getInt("status")
+                when (rs.getInt("data_type")) {
+                    34 -> when (status) {
+                        1 -> if (!aList.contains(id)) aList.add(id)
+                        else -> if (aList.contains(id)) aList.remove(id)
+                    }
+                    43 -> when (status) {
+                        1 -> if (!vList.contains(id)) vList.add(id)
+                        else -> if (vList.contains(id)) vList.remove(id)
+                    }
+                    3 -> when (status) {
+                        1 -> if (!iList.contains(id)) iList.add(id)
+                        else -> if (iList.contains(id)) iList.remove(id)
+                    }
+                    5 -> when (status) {
+                        1 -> if (!oList.contains(id)) oList.add(id)
+                        else -> if (oList.contains(id)) oList.remove(id)
+                    }
                 }
             }
         }
