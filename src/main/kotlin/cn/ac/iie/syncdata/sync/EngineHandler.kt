@@ -5,7 +5,7 @@ import cn.ac.iie.syncdata.data.MMData
 import cn.ac.iie.syncdata.data.Metadata
 import cn.ac.iie.syncdata.data.MppConf
 import cn.ac.iie.syncdata.db.DBUtil
-import cn.ac.iie.syncdata.server.MMSync
+import cn.ac.iie.syncdata.server.MMSyncServer
 import com.google.gson.GsonBuilder
 import org.slf4j.LoggerFactory
 import java.sql.ResultSet
@@ -31,12 +31,16 @@ class EngineHandler : Runnable {
             start.set(false)
         }
 
+        private fun generateSequenceID(): String {
+            return UUID.randomUUID().toString().replace("-".toRegex(), "${Random().nextInt(9)}").toUpperCase()
+        }
+
         fun pushData(mm: MMData) {
             val url = ("http://" + config().ipArray[idx.getAndIncrement() % config().ipArray.size] + ":20099/get?key=" + mm.key)
 
-            val jedis = MMSync.rpp.rpL1.resource
+            val jedis = MMSyncServer.rpp.rpL1.resource
             if (jedis != null) {
-                val md = Metadata(uuid = UUID.randomUUID().toString(), url = url, mppConf = MppConf(table = mm.table, u_ch_id = mm.u_ch_id, m_chat_room = mm.m_chat_room, m_ch_id = mm.m_ch_id))
+                val md = Metadata(uuid =generateSequenceID(), url = url, mppConf = MppConf(table = mm.table, u_ch_id = mm.u_ch_id, m_chat_room = mm.m_chat_room, m_ch_id = mm.m_ch_id))
                 try {
                     when (mm.key!![0]) {
                         'a' -> for (eid in aList) {
@@ -62,7 +66,7 @@ class EngineHandler : Runnable {
                         else -> log.error("mm -> {}", mm)
                     }
                 } finally {
-                    MMSync.rpp.rpL1.putInstance(jedis)
+                    MMSyncServer.rpp.rpL1.putInstance(jedis)
                 }
             }
         }

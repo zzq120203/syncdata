@@ -21,7 +21,7 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
         var seq = 0L
         var mmd: MMData
         do {
-            val jedis = MMSync.szobs.pc.rpL1.resource
+            val jedis = MMSyncServer.szobs.pc.rpL1.resource
             jedis?.let {
                 try {
                     val map = it.hgetAll(config().obsQueue)
@@ -44,7 +44,7 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
                         }
                     }
                 } finally {
-                    MMSync.szobs.pc.rpL1.putInstance(it)
+                    MMSyncServer.szobs.pc.rpL1.putInstance(it)
                 }
             }
         } while (start.get())

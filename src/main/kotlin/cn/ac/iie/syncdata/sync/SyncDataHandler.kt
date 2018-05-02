@@ -1,8 +1,7 @@
 package cn.ac.iie.syncdata.sync
 
-import cn.ac.iie.syncdata.configs.config
 import cn.ac.iie.syncdata.data.MMData
-import cn.ac.iie.syncdata.server.MMSync
+import cn.ac.iie.syncdata.server.MMSyncServer
 import cn.ac.iie.syncdata.tools.Silk2WavConvert
 import com.lmax.disruptor.LifecycleAware
 import com.lmax.disruptor.WorkHandler
@@ -16,7 +15,7 @@ class SyncDataHandler : WorkHandler<MMData>, LifecycleAware {
     private val name = "SyncDataHandlerThread-"
     override fun onEvent(md: MMData) {
         md.key?.let {
-            val outContent = MMSync.szobs.get(it)
+            val outContent = MMSyncServer.szobs.get(it)
             if (outContent == null || outContent.isEmpty()) {
                 log.error("Audio outContent:null, data -> $md")
                 return
@@ -25,7 +24,7 @@ class SyncDataHandler : WorkHandler<MMData>, LifecycleAware {
                 'a' -> Silk2WavConvert.silk2wav(outContent)
                 else -> outContent
             }
-            MMSync.sbobs.put(md.key, inContent, false)
+            MMSyncServer.sbobs.put(md.key, inContent, false)
             EngineHandler.pushData(md)
             log.info("sz -> sb, data -> $md")
         }

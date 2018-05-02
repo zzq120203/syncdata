@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.concurrent.TimeUnit
 
-object MMSync {
-    private val log = LoggerFactory.getLogger(MMSync::class.java)
+object MMSyncServer {
+    private val log = LoggerFactory.getLogger(MMSyncServer::class.java)
 
     private val disruptor = Disruptor(EventFactory { MMData() }, 256, DaemonThreadFactory.INSTANCE, ProducerType.MULTI, BlockingWaitStrategy())
 
@@ -43,7 +43,7 @@ object MMSync {
 
     @JvmStatic
     fun main(args: Array<String>) {
-        log.info("MMSync starting")
+        log.info("MMSyncServer starting")
         try {
             Thread(EngineHandler(), "EngineHandlerThread").start()
 
@@ -58,7 +58,7 @@ object MMSync {
             getMetaData.start()
 
             Runtime.getRuntime().addShutdownHook(Thread {
-                log.info("MMSync stopping")
+                log.info("MMSyncServer stopping")
                 GetOBSData.stop()
                 EngineHandler.stop()
 

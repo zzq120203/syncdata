@@ -4,6 +4,5 @@ class Silk2PcmJni {
     init {
         System.loadLibrary("silk")
     }
-
     external fun silk2pcm(inSilk: ByteArray): ByteArray?
 }
