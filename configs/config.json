@@ -5,8 +5,8 @@
   "queue": "tea.data.queue",
   "szClientUrl": "http://10.138.25.24:8099",
   "sbClientUrl": "http://10.138.25.24:8099",
-  "mppConf": {
-    "url": "jdbc.iie.DBroker://10.144.16.18:21811,10.144.16.19:21811,10.144.16.20:21811/msg_db;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=mppserver",
+  "mysqlConf": {
+    "url": "jdbc:mysql://10.128.98.16:3306/mydb?useSSL=false",
     "username": "zzq",
     "password": "zzq",
     "filters": "stat",
@@ -21,5 +21,17 @@
     "testOnReturn": "false",
     "poolPreparedStatements": "true",
     "maxPoolPreparedStatementPerConnectionSize": "200"
-  }
+  },
+  "ipArray": [
+    "10.136.140.16",
+    "10.136.140.17",
+    "10.136.140.18",
+    "10.136.140.19",
+    "10.136.140.20",
+    "10.136.140.21",
+    "10.136.140.22",
+    "10.136.140.23",
+    "10.136.140.24",
+    "10.136.140.25"
+  ]
 }

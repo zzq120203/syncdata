@@ -33,7 +33,7 @@ dependencies {
     compile("io.javalin:javalin:1.4.1")
     compile("com.squareup.okhttp3:okhttp:3.10.0")
     compile("com.alibaba", "druid", "1.1.8")
-
+    compile("mysql:mysql-connector-java:8.0.9-rc")
     compile("com.google.code.gson:gson:2.8.2")
     compile("com.lmax:disruptor:3.3.7")
     compile("redis.clients:jedis:2.9.0")

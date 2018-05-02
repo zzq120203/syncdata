@@ -32,11 +32,11 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
                             mmd = ringBuffer.get(seq)
                             mmd.key = key
                             mmd.g_id = md.g_id
-                            mmd.table = mmd.table
+                            mmd.table = md.table
                             mmd.m_ch_id = md.m_ch_id
                             mmd.m_chat_room = md.m_chat_room
-                            mmd.u_ch_id = mmd.u_ch_id
-                            mmd.type = mmd.type
+                            mmd.u_ch_id = md.u_ch_id
+                            mmd.type = md.type
                             mmd.q_id = md.q_id
                             mmd.q_mm_md5_rk = md.q_mm_md5_rk
                         } finally {

@@ -37,8 +37,8 @@ object MMSyncServer {
         ConfLoading.init("configs/config.json")
 
         rpp.init(config().urls, config().authToken)
-        rpp.init(config().sbClientUrl, null)
-        rpp.init(config().szClientUrl, null)
+        sbobs.init(config().sbClientUrl, "TEST")
+        szobs.init(config().szClientUrl, "TEST")
     }
 
     @JvmStatic

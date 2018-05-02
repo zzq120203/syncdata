@@ -43,25 +43,25 @@ class EngineHandler : Runnable {
                 val md = Metadata(uuid =generateSequenceID(), url = url, mppConf = MppConf(table = mm.table, u_ch_id = mm.u_ch_id, m_chat_room = mm.m_chat_room, m_ch_id = mm.m_ch_id))
                 try {
                     when (mm.key!![0]) {
-                        'a' -> for (eid in aList) {
+                        'a' -> for (idx in aList) {
                             val json = gson.toJson(md)
-                            log.info("eid -> $eid, md -> $json")
-                            jedis.rpush("${config().queue}.$eid", json)
+                            log.info("idx -> $idx, md -> $json")
+                            jedis.rpush("${config().queue}.$idx", json)
                         }
-                        'v' -> for (eid in vList) {
+                        'v' -> for (idx in vList) {
                             val json = gson.toJson(md)
-                            log.info("eid -> $eid, md -> $json")
-                            jedis.rpush("${config().queue}.$eid", json)
+                            log.info("idx -> $idx, md -> $json")
+                            jedis.rpush("${config().queue}.$idx", json)
                         }
-                        'i' -> for (eid in iList) {
+                        'i' -> for (idx in iList) {
                             val json = gson.toJson(md)
-                            log.info("eid -> $eid, md -> $json")
-                            jedis.rpush("${config().queue}.$eid", json)
+                            log.info("idx -> $idx, md -> $json")
+                            jedis.rpush("${config().queue}.$idx", json)
                         }
-                        'o' -> for (eid in oList) {
+                        'o' -> for (idx in oList) {
                             val json = gson.toJson(md)
-                            log.info("eid -> $eid, md -> $json")
-                            jedis.rpush("${config().queue}.$eid", json)
+                            log.info("idx -> $idx, md -> $json")
+                            jedis.rpush("${config().queue}.$idx", json)
                         }
                         else -> log.error("mm -> {}", mm)
                     }
@@ -73,7 +73,7 @@ class EngineHandler : Runnable {
     }
 
     override fun run() {
-        val sql = "select id,e_id,data_type,parent,status from engine;"
+        val sql = "select id,e_type,data_type,parent,status from engine;"
         do {
             DBUtil.selectMysql(sql = sql, print = false, resultFun = ::getEngine)
         } while (start.get())
@@ -83,24 +83,24 @@ class EngineHandler : Runnable {
         while (rs.next()) {
             val parent = rs.getString("parent")
             if (parent.isNullOrEmpty()) {
-                val id = rs.getString("e_id") + "-" + rs.getInt("id")
+                val idx = rs.getString("e_type") + "-" + rs.getInt("id")
                 val status = rs.getInt("status")
                 when (rs.getInt("data_type")) {
                     34 -> when (status) {
-                        1 -> if (!aList.contains(id)) aList.add(id)
-                        else -> if (aList.contains(id)) aList.remove(id)
+                        1 -> if (!aList.contains(idx)) aList.add(idx)
+                        else -> if (aList.contains(idx)) aList.remove(idx)
                     }
                     43 -> when (status) {
-                        1 -> if (!vList.contains(id)) vList.add(id)
-                        else -> if (vList.contains(id)) vList.remove(id)
+                        1 -> if (!vList.contains(idx)) vList.add(idx)
+                        else -> if (vList.contains(idx)) vList.remove(idx)
                     }
                     3 -> when (status) {
-                        1 -> if (!iList.contains(id)) iList.add(id)
-                        else -> if (iList.contains(id)) iList.remove(id)
+                        1 -> if (!iList.contains(idx)) iList.add(idx)
+                        else -> if (iList.contains(idx)) iList.remove(idx)
                     }
                     5 -> when (status) {
-                        1 -> if (!oList.contains(id)) oList.add(id)
-                        else -> if (oList.contains(id)) oList.remove(id)
+                        1 -> if (!oList.contains(idx)) oList.add(idx)
+                        else -> if (oList.contains(idx)) oList.remove(idx)
                     }
                 }
             }
