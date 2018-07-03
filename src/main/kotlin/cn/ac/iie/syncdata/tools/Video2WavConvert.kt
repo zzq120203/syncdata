@@ -1,18 +1,19 @@
 package cn.ac.iie.syncdata.tools
 
 import it.sauronsoftware.jave.*
-
 import java.io.File
 
-object AudioVideoEncoder {
+object Video2WavConvert {
 
-    fun mp42wav(sourcePath: String, targetPath: String) {
-        val source = File(sourcePath)
-        val target = File(targetPath)
-        mp42wav(source, target)
+
+    fun video2wav(key: String, outContent: ByteArray) {
+        val tmp = File("tmp/$key").apply {
+            writeBytes(outContent)
+        }
+        mp42wav(tmp, File("a/$key"))
     }
 
-    fun mp42wav(source: File, target: File) {
+    private fun mp42wav(source: File, target: File) {
         val audio = AudioAttributes()
         audio.setCodec("pcm_s16le")
         val attrs = EncodingAttributes()
@@ -21,5 +22,4 @@ object AudioVideoEncoder {
         val encoder = Encoder()
         encoder.encode(source, target, attrs)
     }
-
 }

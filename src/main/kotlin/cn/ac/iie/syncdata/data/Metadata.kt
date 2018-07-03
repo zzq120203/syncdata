@@ -1,9 +1,10 @@
 package cn.ac.iie.syncdata.data
 
 data class Metadata(
-        var serverName: String? = "mmSync",
+        var serverName: String = "mmSync",
         var uuid: String? = null,
         var url: String? = null,
+        var type: String? = null,
         var mppConf: MppConf? = null
 )
 

@@ -7,9 +7,10 @@ import com.lmax.disruptor.RingBuffer
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
 
-class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
+class GetOBSData(private val ringBuffer: RingBuffer<MMData>) : Runnable {
     private val log = LoggerFactory.getLogger(GetOBSData::class.java)
     private val gson = GsonBuilder().disableHtmlEscaping().create()
+
     companion object {
         private val start = AtomicBoolean(true)
         fun stop() {
@@ -21,12 +22,14 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
         var seq = 0L
         var mmd: MMData
         do {
+            try {
             val jedis = MMSyncServer.szobs.pc.rpL1.resource
             jedis?.let {
                 try {
                     val map = it.hgetAll(config().obsQueue)
                     map.forEach { key, value ->
-                        val md = gson.fromJson(value, MMData::class.java)
+                        val md = if (value.contains("table")) gson.fromJson(value, MMData::class.java)
+                        else MMData(key = key)
                         try {
                             seq = ringBuffer.next()
                             mmd = ringBuffer.get(seq)
@@ -39,6 +42,9 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
                             mmd.type = md.type
                             mmd.q_id = md.q_id
                             mmd.q_mm_md5_rk = md.q_mm_md5_rk
+
+                            jedis.hdel(config().obsQueue ,key)
+                            log.info("tea key -> $key, value -> $value")
                         } finally {
                             ringBuffer.publish(seq)
                         }
@@ -46,6 +52,9 @@ class GetOBSData(private val ringBuffer: RingBuffer<MMData>): Runnable {
                 } finally {
                     MMSyncServer.szobs.pc.rpL1.putInstance(it)
                 }
+            }
+            } catch (e: Exception) {
+                log.error("e -> ${e.javaClass}, msg -> ${e.message}")
             }
         } while (start.get())
     }

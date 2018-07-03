@@ -8,6 +8,7 @@ import cn.ac.iie.syncdata.db.DBUtil
 import cn.ac.iie.syncdata.server.MMSyncServer
 import com.google.gson.GsonBuilder
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.sql.ResultSet
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -32,26 +33,31 @@ class EngineHandler : Runnable {
         }
 
         private fun generateSequenceID(): String {
-            return UUID.randomUUID().toString().replace("-".toRegex(), "${Random().nextInt(9)}").toUpperCase()
+            return UUID.randomUUID().toString().replace("-".toRegex(), "${Random().nextInt(99)}").toUpperCase()
         }
 
-        fun pushData(mm: MMData) {
-            val url = ("http://" + config().ipArray[idx.getAndIncrement() % config().ipArray.size] + ":20099/get?key=" + mm.key)
+        fun pushData(mm: MMData, m2w: Boolean = false) {
+            val url = if (m2w) config().urls + "/a/" + mm.key//视频语音通道数据
+            else ("http://" + config().ipArray[idx.getAndIncrement() % config().ipArray.size] + ":20099/get?key=" + mm.key)
 
             val jedis = MMSyncServer.rpp.rpL1.resource
-            if (jedis != null) {
-                val md = Metadata(uuid =generateSequenceID(), url = url, mppConf = MppConf(table = mm.table, u_ch_id = mm.u_ch_id, m_chat_room = mm.m_chat_room, m_ch_id = mm.m_ch_id))
+            jedis?.let {
+                val md = Metadata(serverName = "Sync Data", uuid = generateSequenceID(), url = url, type = mm.type, mppConf = MppConf(table = mm.table, u_ch_id = mm.u_ch_id, m_chat_room = mm.m_chat_room, m_ch_id = mm.m_ch_id))
                 try {
                     when (mm.key!![0]) {
                         'a' -> for (idx in aList) {
+                            md.type = "wav"
                             val json = gson.toJson(md)
                             log.info("idx -> $idx, md -> $json")
                             jedis.rpush("${config().queue}.$idx", json)
                         }
-                        'v' -> for (idx in vList) {
-                            val json = gson.toJson(md)
-                            log.info("idx -> $idx, md -> $json")
-                            jedis.rpush("${config().queue}.$idx", json)
+                        'v' -> {
+                            val list = if (m2w) aList else vList//视频语音通道数据
+                            for (idx in list) {
+                                val json = gson.toJson(md)
+                                log.info("idx -> $idx, md -> $json")
+                                jedis.rpush("${config().queue}.$idx", json)
+                            }
                         }
                         'i' -> for (idx in iList) {
                             val json = gson.toJson(md)
