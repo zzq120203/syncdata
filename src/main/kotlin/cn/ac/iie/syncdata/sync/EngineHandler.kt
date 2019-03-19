@@ -37,7 +37,7 @@ class EngineHandler : Runnable {
         }
 
         fun pushData(mm: MMData, m2w: Boolean = false) {
-            val url = if (m2w) config().urls + "/a/" + mm.key//视频语音通道数据
+            val url = if (m2w) config().ip + "/a/" + mm.key//视频语音通道数据
             else ("http://" + config().ipArray[idx.getAndIncrement() % config().ipArray.size] + ":20099/get?key=" + mm.key)
 
             val jedis = MMSyncServer.rpp.rpL1.resource

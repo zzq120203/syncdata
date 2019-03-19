@@ -12,6 +12,11 @@ object Silk2WavConvert {
         if (pcm == null || pcm.isEmpty()) {
             return null
         }
+        return pcm2wav(pcm)
+    }
+
+    @Throws(Exception::class)
+    fun pcm2wav(pcm: ByteArray): ByteArray? {
         val header = WaveHeader(dataHdrLeth = pcm.size)
         val h = header.getHeader()
         assert(h.size == 44) // WAV标准，头部应该是44字节
@@ -25,7 +30,7 @@ object Silk2WavConvert {
             var bitsPerSample: Short = 16,
             var channels: Short = 1,
             var formatTag: Short = 0x0001,
-            var samplesPerSec: Int = 8000,
+            var samplesPerSec: Int = 16000,
             var blockAlign: Short = (channels * bitsPerSample / 8).toShort(),
             var avgBytesPerSec: Int = blockAlign * samplesPerSec,
             var fileId: CharArray = charArrayOf('R', 'I', 'F', 'F'),

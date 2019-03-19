@@ -15,6 +15,7 @@ object ConfLoading {
 }
 
 data class ConfigAll(
+        val ip: String = "http://10.144.58.20:9210",
         val urls: String = "STA://localhost:20099",
         val authToken: String? = null,
         val obsQueue: String = "obsQueue",//多媒体数据
